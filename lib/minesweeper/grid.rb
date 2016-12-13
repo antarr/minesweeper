@@ -11,19 +11,19 @@ module Minesweeper
     end
 
     def choose(i, j)
-      if @matrix[i][j] == 'M'
+      if @matrix[i][j].armed?
         render
         print_mine_hit
         true
       else
-        @matrix[i][j] = '.'
+        @matrix[i][j] = Block.new Block.visited_block
         render_consealed
         ended?
       end
     end
 
     def ended?
-      if !@matrix.flatten.uniq.join('').include? 'X'
+      if !@matrix.flatten.uniq.join('').include? Block.armed_block
         print_game_won
         true
       else
@@ -38,15 +38,15 @@ module Minesweeper
     end
 
     def initialize_matrix(n)
-      @matrix = Array.new(n) { Array.new(n, 'X') }
+      @matrix = Array.new(n) { Array.new(n, Block.new) }
     end
 
     def place_mines(n, mines)
       while mines > 0
         i = (0..(n - 1)).to_a.sample
         j = (0...(n - 1)).to_a.sample
-        next unless @matrix[i][j] == 'X'
-        @matrix[i][j] = 'M'
+        next unless @matrix[i][j].to_s == Block.safe_block
+        @matrix[i][j] = Block.new Block.armed_block
         mines -= 1
       end
     end
@@ -62,7 +62,7 @@ module Minesweeper
     def render
       matrix.each do |row|
         row.each do |col|
-          print(" #{col} ")
+          print col
         end
         break_line
       end
@@ -78,8 +78,7 @@ module Minesweeper
       matrix.each_with_index do |row, i|
         print i
         row.each do |col|
-          print(' ◼ ') unless col == '.'
-          print ' . ' if col == '.'
+          print col.to_s == Block.armed_block ? Block.safe_block : col
         end
         break_line
       end

@@ -1,6 +1,8 @@
 require_relative './grid'
 module Minesweeper
   class Game
+    attr_reader :grid
+
     def initialize(n, mines)
       @grid = Grid.new(n, mines)
     end
